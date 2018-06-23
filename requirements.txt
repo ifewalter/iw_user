@@ -1,3 +1,7 @@
 umongo
 umongo[pymongo]
+umongo[mongomock]
+mongomock
 bcrypt
+-e git+ssh://git@github.com/ifewalter/iw_utils.git#egg=iw_utils
+patch

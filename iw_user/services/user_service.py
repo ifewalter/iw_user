@@ -1,10 +1,13 @@
+import copy
+
 import bcrypt
 from iw_utils.utils import Util
-from models.user_model import UserModel
+
+from iw_user.models.user_model import UserModel
 
 
 class UserService(object):
-    def create_user(self):
+    def create_user(self)->UserModel:
         self.user_model.password = bcrypt.hashpw(self.user_model.password.encode('utf-8'), bcrypt.gensalt(14)).decode(
             'utf-8')
         self.user_model.auth_token = self.util.generate_token()
@@ -13,8 +16,12 @@ class UserService(object):
         self.user_model.commit()
         return self.user_model
 
+    def update_user_details(self)->UserModel:
+        self.user_model.commit(conditions={'username':self.user_model.username})
+        return self.user_model
+
     # TODO: Make this function return user details including tokens and stuff
-    def authenticate_user(self):
+    def authenticate_user(self)->UserModel:
 
         self.user_model = self.user_model.find_one({"username": self.user_model.username})
 
@@ -26,36 +33,28 @@ class UserService(object):
 
         return None
 
-    def verify_identity_by_token(self):
-        self.user_model = self.user_model.find_one({"auth_token":self.user_model.auth_token})
-        
-        if self.user_model:
-                return True
-        return False
+    def get_user_from_token(self):
 
-    def get_user_id_from_token(self):
-
-        self.user_model = self.user_model.find_one({"auth_token":self.user_model.auth_token})
-        return self.user_model['_id']
-
+        self.user_model = self.user_model.find_one({"auth_token": self.user_model.auth_token})
+        return self.user_model
 
     def generate_user_otp(self):
-        return pyotp.TOTP(user.random_seed, interval=300).now()
+        return self.util.generate_totp(self.user_model.random_seed)
 
     def regenerate_user_otp(self, nonce):
-        user_model = User.find_one({'auth_nonce': nonce})
+        user_model = self.user_model.find_one({'auth_nonce': nonce})
 
         user_model_2 = copy.deepcopy(user_model)
         user_model.auth_nonce = Util.generate_token()
         user_model.commit(conditions={'auth_nonce': user_model_2.auth_nonce})
 
-    def verify_user_otp(self, nonce, otp):
-        user_model = self.util.find_one({'auth_nonce': nonce})
+    def verify_user_otp(self, otp):
+        self.user_model = self.user_model.find_one({'auth_nonce': self.user_model.random_seed})
 
-        if user_model is not None:
-            return pyotp.TOTP(user_model.random_seed, interval=300).verify(otp), user_model
-        return False, user_model
+        if self.user_model is not None:
+            return self.util.verify_totp(self.user_model.random_seed, otp), self.user_model
+        return False, self.user_model
 
-    def __init__(self, user_model: dict):
-        self.user_model = UserModel()
+    def __init__(self, user_model: UserModel):
+        self.user_model = user_model
         self.util = Util()

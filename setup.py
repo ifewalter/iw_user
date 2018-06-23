@@ -8,11 +8,9 @@ setup(
     include_package_data=True,
     packages = find_packages(exclude=["*.tests", "*.tests.*", "tests.*", "tests"]),
     install_requires=[
-        'iw_utils==0.3',
-        'bson'
+        
     ],
     dependency_links=[
-        'lib/'
     ]
 
 )
