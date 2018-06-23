@@ -1,0 +1,3 @@
+umongo
+umongo[pymongo]
+bcrypt
