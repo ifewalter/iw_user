@@ -1,9 +1,4 @@
-import os
-import sys
 from unittest import TestCase, mock
-
-import patch
-from marshmallow import ValidationError
 
 from iw_user.models.user_model import UserModel
 from iw_user.services.user_service import UserService
