@@ -56,7 +56,7 @@ jobs:
           command: |
             . venv/bin/activate
             nosetests
-            python3 setup.py install
+            python3 setup.py develop
 
       - store_artifacts:
           path: test-reports
