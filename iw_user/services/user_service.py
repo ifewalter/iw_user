@@ -20,7 +20,6 @@ class UserService(object):
         self.user_model.commit(conditions={'username':self.user_model.username})
         return self.user_model
 
-    # TODO: Make this function return user details including tokens and stuff
     def authenticate_user(self)->UserModel:
 
         self.user_model = self.user_model.find_one({"username": self.user_model.username})
